@@ -1,5 +1,5 @@
 {
-  "name": "@agent-dom/core",
+  "name": "agent-dom",
   "version": "0.1.0",
   "description": "A browser-native semantic DOM API for AI agents.",
   "type": "module",
@@ -34,6 +34,17 @@
     "automation"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/undo76/agent-dom.git"
+  },
+  "homepage": "https://github.com/undo76/agent-dom#readme",
+  "bugs": {
+    "url": "https://github.com/undo76/agent-dom/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "dom-accessibility-api": "^0.7.1"
   },

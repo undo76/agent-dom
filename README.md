@@ -1,19 +1,22 @@
 # agent-dom
 
-`@agent-dom/core` is a browser-native semantic DOM API for AI agents. It runs inside the page, derives roles and accessible names from DOM and ARIA, produces a compact observation, and maps short-lived refs back to real elements for actions.
+[![npm version](https://img.shields.io/npm/v/agent-dom.svg)](https://www.npmjs.com/package/agent-dom)
+[![Publish to npm](https://github.com/undo76/agent-dom/actions/workflows/publish.yml/badge.svg)](https://github.com/undo76/agent-dom/actions/workflows/publish.yml)
+
+`agent-dom` is a browser-native semantic DOM API for AI agents. It runs inside the page, derives roles and accessible names from DOM and ARIA, produces a compact observation, and maps short-lived refs back to real elements for actions.
 
 It does not require Playwright, Puppeteer, CDP, or a remote browser.
 
 ## Install
 
 ```sh
-npm install @agent-dom/core
+npm install agent-dom
 ```
 
 ## Observe and act
 
 ```ts
-import { createAgentPage } from "@agent-dom/core";
+import { createAgentPage } from "agent-dom";
 
 const page = createAgentPage(window);
 const observation = page.observe();
