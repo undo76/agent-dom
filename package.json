@@ -1,0 +1,46 @@
+{
+  "name": "@agent-dom/core",
+  "version": "0.1.0",
+  "description": "A browser-native semantic DOM API for AI agents.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "test": "vitest run --environment happy-dom",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm run test && npm run build"
+  },
+  "keywords": [
+    "ai-agent",
+    "accessibility",
+    "browser",
+    "dom",
+    "aria",
+    "automation"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "dom-accessibility-api": "^0.7.1"
+  },
+  "devDependencies": {
+    "happy-dom": "^20.11.12",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.11"
+  }
+}
