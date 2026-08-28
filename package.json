@@ -1,5 +1,5 @@
 {
-  "name": "agent-dom",
+  "name": "@undo76/agent-dom",
   "version": "0.1.0",
   "description": "A browser-native semantic DOM API for AI agents.",
   "type": "module",
