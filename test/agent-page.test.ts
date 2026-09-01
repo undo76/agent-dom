@@ -112,12 +112,32 @@ describe("locators and actions", () => {
     expect(document.querySelector<HTMLSelectElement>("select")!.value).toBe("fr");
   });
 
-  it("rejects stale refs after a DOM mutation", () => {
+  it("rejects stale refs after a DOM mutation when stale: 'generation'", () => {
     document.body.innerHTML = `<button>Old action</button>`;
-    page = createAgentPage(window);
+    page = createAgentPage(window, { stale: "generation" });
     const ref = page.observe().findByRole("button").ref;
     document.body.append(document.createElement("p"));
 
+    expect(() => page!.click(ref)).toThrow(StaleElementReferenceError);
+  });
+
+  it("keeps refs alive through unrelated mutations by default", () => {
+    document.body.innerHTML = `<nav><a href="#home">Home</a></nav><div id="chat"><span id="stream">Hi</span></div>`;
+    const link = document.querySelector<HTMLAnchorElement>("a")!;
+    const onClick = vi.fn();
+    link.addEventListener("click", onClick);
+    page = createAgentPage(window);
+    const ref = page.observe({ interactiveOnly: true }).findByRole("link", { name: "Home" }).ref;
+
+    // a streaming chat, spinner or clock mutating a sibling subtree
+    for (let token = 0; token < 5; token++) {
+      document.getElementById("chat")!.insertAdjacentHTML("beforeend", `<p>token ${token}</p>`);
+      expect(() => page!.click(ref)).not.toThrow();
+    }
+    expect(onClick).toHaveBeenCalledTimes(5);
+
+    // the ref's own element going away still fails
+    link.remove();
     expect(() => page!.click(ref)).toThrow(StaleElementReferenceError);
   });
 

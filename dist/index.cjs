@@ -462,12 +462,14 @@ var AgentPage = class {
   root;
   #documentGeneration = 0;
   #snapshotGeneration = 0;
+  #stale;
   #refState;
   #observation;
   #observer;
   constructor(window, options = {}) {
     this.window = window;
     this.root = options.root ?? window.document;
+    this.#stale = options.stale ?? "connected";
     const document = ownerDocument(this.root);
     if (document.defaultView !== window) {
       throw new TypeError("The root must belong to the supplied window.");
@@ -568,7 +570,9 @@ var AgentPage = class {
   #freshObservation() {
     this.#syncMutations();
     if (!this.#observation || !this.#refState) return this.observe();
-    if (this.#refState.documentGeneration !== this.#documentGeneration) return this.observe();
+    if (this.#stale === "generation" && this.#refState.documentGeneration !== this.#documentGeneration) {
+      return this.observe();
+    }
     return this.#observation;
   }
   #resolve(ref) {
@@ -576,7 +580,7 @@ var AgentPage = class {
     const normalized = normalizeRef(ref);
     const state = this.#refState;
     if (!state) throw new ElementNotFoundError("Observe the page before using a ref.");
-    if (state.documentGeneration !== this.#documentGeneration) {
+    if (this.#stale === "generation" && state.documentGeneration !== this.#documentGeneration) {
       throw new StaleElementReferenceError(normalized, state.snapshotGeneration, this.#snapshotGeneration + 1);
     }
     const element = state.refs.get(normalized);

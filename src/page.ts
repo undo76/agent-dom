@@ -16,6 +16,7 @@ import type {
   Observation,
   ObserveOptions,
   RoleLocatorOptions,
+  StalePolicy,
   TextMatch,
 } from "./types";
 
@@ -35,6 +36,7 @@ export class AgentPage {
 
   #documentGeneration = 0;
   #snapshotGeneration = 0;
+  #stale: StalePolicy;
   #refState: RefState | undefined;
   #observation: AgentObservation | undefined;
   #observer: MutationObserver;
@@ -42,6 +44,7 @@ export class AgentPage {
   constructor(window: BrowserWindow, options: CreateAgentPageOptions = {}) {
     this.window = window;
     this.root = options.root ?? window.document;
+    this.#stale = options.stale ?? "connected";
 
     const document = ownerDocument(this.root);
     if (document.defaultView !== window) {
@@ -161,7 +164,9 @@ export class AgentPage {
   #freshObservation(): AgentObservation {
     this.#syncMutations();
     if (!this.#observation || !this.#refState) return this.observe() as AgentObservation;
-    if (this.#refState.documentGeneration !== this.#documentGeneration) return this.observe() as AgentObservation;
+    if (this.#stale === "generation" && this.#refState.documentGeneration !== this.#documentGeneration) {
+      return this.observe() as AgentObservation;
+    }
     return this.#observation;
   }
 
@@ -171,7 +176,7 @@ export class AgentPage {
     const state = this.#refState;
     if (!state) throw new ElementNotFoundError("Observe the page before using a ref.");
 
-    if (state.documentGeneration !== this.#documentGeneration) {
+    if (this.#stale === "generation" && state.documentGeneration !== this.#documentGeneration) {
       throw new StaleElementReferenceError(normalized, state.snapshotGeneration, this.#snapshotGeneration + 1);
     }
 

@@ -15,5 +15,6 @@ export type {
   ObservedElement,
   ObserveOptions,
   RoleLocatorOptions,
+  StalePolicy,
   TextMatch,
 } from "./types";

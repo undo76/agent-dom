@@ -96,16 +96,31 @@ A locator throws if it finds zero or multiple elements. This keeps agent actions
 
 ## Ref lifetime
 
-Refs belong to one observation. A `MutationObserver` tracks changes to the document, including attribute and text changes. If the DOM changes, an action using an older ref throws `StaleElementReferenceError` and the agent must observe again.
+A ref identifies one element in the last observation. By default (`stale: "connected"`) it stays valid until that **own** element leaves the document, so unrelated page churn — streamed chat, spinners, clocks, framework re-renders — does not stop you acting.
 
 ```ts
-const first = page.observe();
-const button = first.findByRole("button").ref;
+const obs = page.observe({ interactiveOnly: true });
+const link = obs.findByRole("link", { name: "Home" }).ref;
+
+chat.append(document.createTextNode("thinking…")); // sibling subtree mutates
+page.click(link);                                   // works
+
+sidebar.querySelector("a")?.remove();
+page.click(link);                                 // StaleElementReferenceError
+```
+
+Opt into strict snapshot semantics with `stale: "generation"`, where any mutation under the root invalidates every older ref:
+
+```ts
+const strict = createAgentPage(window, { stale: "generation" });
+const ref = strict.observe().findByRole("button").ref;
 
 document.body.append(document.createElement("div"));
 
-page.click(button); // throws StaleElementReferenceError
+strict.click(ref); // throws StaleElementReferenceError
 ```
+
+The trade is freshness, not safety: under `"connected"` a ref can resolve to an element whose text changed since you observed it. Re-observe when the label is the contract (totals, quantities, confirm dialogs); `disabled` and removed elements are still caught.
 
 ## Browser boundaries
 

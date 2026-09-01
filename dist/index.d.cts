@@ -74,7 +74,19 @@ type AgentAction = {
 };
 interface CreateAgentPageOptions {
     root?: Document | Element | ShadowRoot;
+    /**
+     * When a ref stops being usable.
+     *
+     * - `"connected"` (default): a ref stays valid until *its own* element is removed.
+     *   Real pages never stop mutating — streaming chat, spinners, clocks, toasts,
+     *   virtualised lists, framework re-renders. A policy that reacted to all of it
+     *   would mean no action ever lands on a live page.
+     * - `"generation"`: any mutation anywhere under the root invalidates every ref from
+     *   the previous observation. Opt in for stepwise harnesses that must be current.
+     */
+    stale?: StalePolicy;
 }
+type StalePolicy = "generation" | "connected";
 
 declare class AgentPage {
     #private;
@@ -125,4 +137,4 @@ declare class ActionError extends AgentDomError {
     readonly name: string;
 }
 
-export { ActionError, type AgentAction, AgentDomError, AgentObservation, AgentPage, type BrowserWindow, type CreateAgentPageOptions, ElementNotFoundError, type ElementState, type Observation, type ObserveOptions, type ObservedElement, type RoleLocatorOptions, StaleElementReferenceError, type TextMatch, createAgentPage };
+export { ActionError, type AgentAction, AgentDomError, AgentObservation, AgentPage, type BrowserWindow, type CreateAgentPageOptions, ElementNotFoundError, type ElementState, type Observation, type ObserveOptions, type ObservedElement, type RoleLocatorOptions, StaleElementReferenceError, type StalePolicy, type TextMatch, createAgentPage };
